@@ -1,0 +1,148 @@
+" capshil's vimrc
+" Pierre RABY <pierre.raby.pro@gmail.com>
+" Fork me on GITHUB  https://github.com/capshil/vimrc
+
+set nocompatible	" not compatible with the old-fashion vi mode
+set bs=2		" allow backspacing over everything in insert mode
+set history=50		" keep 50 lines of command line history
+set ruler		" show the cursor position all the time
+set autoread		" auto read when file is changed from outside
+set mouse=a
+
+filetype off          " necessary to make ftdetect work on Linux
+syntax on
+filetype on           " Enable filetype detection
+filetype indent on    " Enable filetype-specific indenting
+filetype plugin on    " Enable filetype-specific plugins
+
+
+" auto reload vimrc when editing it
+autocmd! bufwritepost .vimrc source ~/.vimrc
+
+"  colors capshil 
+
+set clipboard=unnamed	" yank to the system register (*) by default
+set showmatch		" Cursor shows matching ) and }
+set showmode		" Show current mode
+set wildchar=<TAB>	" start wild expansion in the command line using <TAB>
+set wildmenu            " wild char completion menu
+
+" ignore these files while expanding wild chars
+set wildignore=*.o,*.class,*.pyc
+
+set autoindent		" auto indentation
+set incsearch		" incremental search
+set nobackup		" no *~ backup files
+set copyindent		" copy the previous indentation on autoindenting
+set ignorecase		" ignore case when searching
+set smartcase		" ignore case if search pattern is all lowercase,case-sensitive otherwise
+set smarttab		" insert tabs on the start of a line according to context
+
+" TAB setting{
+   set expandtab        "replace <TAB> with spaces
+   set softtabstop=3 
+   set shiftwidth=3 
+
+   au FileType Makefile set noexpandtab
+"}      							
+
+" status line {
+set laststatus=2
+set statusline=\ %{HasPaste()}%<%-15.25(%f%)%m%r%h\ %w\ \ 
+set statusline+=\ \ \ [%{&ff}/%Y] 
+set statusline+=\ \ \ %<%20.30(%{hostname()}:%{CurDir()}%)\ 
+set statusline+=%=%-10.(%l,%c%V%)\ %p%%/%L
+
+function! CurDir()
+    let curdir = substitute(getcwd(), $HOME, "~", "")
+    return curdir
+endfunction
+
+function! HasPaste()
+    if &paste
+        return '[PASTE]'
+    else
+        return ''
+    endif
+endfunction
+
+"}
+
+
+"Restore cursor to file position in previous editing session
+set viminfo='10,\"100,:20,%,n~/.viminfo
+au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|else|exe "norm $"|endif|endif
+
+" Enable omni completion. (Ctrl-X Ctrl-O)
+autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+autocmd FileType css set omnifunc=csscomplete#CompleteCSS
+autocmd FileType c set omnifunc=ccomplete#Complete
+autocmd FileType java set omnifunc=javacomplete#Complete
+
+" use syntax complete if nothing else available
+if has("autocmd") && exists("+omnifunc")
+  autocmd Filetype *
+              \	if &omnifunc == "" |
+              \		setlocal omnifunc=syntaxcomplete#Complete |
+              \	endif
+endif
+
+set cot-=preview "disable doc preview in omnicomplete
+
+" make CSS omnicompletion work for SASS and SCSS
+autocmd BufNewFile,BufRead *.scss             set ft=scss.css
+autocmd BufNewFile,BufRead *.sass             set ft=sass.css
+
+"--------------------------------------------------------------------------- 
+" ENCODING SETTINGS
+"--------------------------------------------------------------------------- 
+set encoding=utf-8                                  
+set termencoding=utf-8
+set fileencoding=utf-8
+set fileencodings=ucs-bom,utf-8,big5,gb2312,latin1
+
+fun! ViewUTF8()
+	set encoding=utf-8                                  
+	set termencoding=big5
+endfun
+
+fun! UTF8()
+	set encoding=utf-8                                  
+	set termencoding=big5
+	set fileencoding=utf-8
+	set fileencodings=ucs-bom,big5,utf-8,latin1
+endfun
+
+fun! Big5()
+	set encoding=big5
+	set fileencoding=big5
+endfun
+
+
+"--------------------------------------------------------------------------- 
+" PLUGIN SETTINGS
+"--------------------------------------------------------------------------- 
+
+" --- AutoClose - Inserts matching bracket, paren, brace or quote 
+" fixed the arrow key problems caused by AutoClose
+if !has("gui_running")	
+   set term=linux
+   imap OA <ESC>ki
+   imap OB <ESC>ji
+   imap OC <ESC>li
+   imap OD <ESC>hi
+
+   nmap OA k
+   nmap OB j
+   nmap OC l
+   nmap OD h
+endif
+
+" --- vim-gitgutter
+let g:gitgutter_enabled = 1
+
+" set ejs filetype to html
+au BufNewFile,BufRead *.ejs set filetype=html
